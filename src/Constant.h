@@ -43,10 +43,10 @@
  * @brief	: 壁伝い走行用PID制御パラメータ
  * ------------------------------------------------------ *
  */
-#define KP    0.6
-#define KI    2.4
-#define KD    0.15
-#define TIME  0.10
+#define KP  0.6
+#define KI  2.0
+#define KD  0.12
+#define TIME 0.10
 
 
 #endif
