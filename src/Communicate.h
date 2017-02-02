@@ -16,7 +16,7 @@
 #include <avr/interrupt.h>
 #include "oi.h"
 #include "Constant.h"
-#include "Main.h"
+#include "System.h"
 
 
 /*

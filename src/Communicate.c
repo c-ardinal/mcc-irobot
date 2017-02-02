@@ -27,7 +27,7 @@ void setBaud(uint8_t baud, unsigned int ubrr){
  * ------------------------------------------------------ *
  * @function: 8bitデータを受信する
  * @param	: void
- * @return	: 8bitのデータ
+ * @return	: 受信したデータ
  * ------------------------------------------------------ *
  */
 uint8_t byteRx(void){

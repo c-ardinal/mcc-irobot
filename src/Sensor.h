@@ -13,10 +13,6 @@
  * @brief	: インクルードファイル
  * ------------------------------------------------------ *
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <avr/interrupt.h>
-#include <avr/io.h>
 #include "oi.h"
 #include "Constant.h"
 #include "Communicate.h"
