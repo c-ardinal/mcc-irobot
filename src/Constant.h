@@ -47,6 +47,7 @@
 #define KI  2.0
 #define KD  0.12
 #define TIME 0.10
-
+#define TARGET_HIGH 150
+#define TARGET_LOW   50
 
 #endif
