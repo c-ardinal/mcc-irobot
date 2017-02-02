@@ -33,11 +33,9 @@
 typedef enum State{
 	WAIT,
 	RUNNING,
-	SEARCH_WALL,
 	SEARCH_HOME,
 	GO_HOME,
-	CHECK_HOME,
-	CHARGING
+	CHECK_HOME
 } robotState_t;
 
 

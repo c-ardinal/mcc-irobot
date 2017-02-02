@@ -25,9 +25,10 @@ robotState_t robotState = WAIT;
 int main (void) {
 	sensor_t sensor;
 	int count=0;
-	//char buff[64];
-
-
+	uint16_t pastWallSignal = 0;
+	char buff[64]; 
+	
+	
 	initRobot();
 
 	byteTx(CmdStart);
@@ -63,8 +64,6 @@ int main (void) {
 
 		// ???W???[???{?^????????
 		if(isPressed(MODULE_BUTTON, sensor)==1){
-			//sprintf(buff, "%u\r\\n", ((unsigned int)(sensor->wallSignal&0x0f00>>4)*16)+(unsigned int)(sensor->wallSignal&0x00ff));
-			//sprintf(buff, "%u\r\\n", sensor->wallSignal);
 			sendString("Hello, Create!!\r\\n");
 		}
 
@@ -123,24 +122,11 @@ int main (void) {
 						resetIntegral();
 					}
 					else{
-						drivePid(culPid(120, sensor->wallSignal));
+						if(sensor->wallSignal>50)
+							drivePid(culPid(150, sensor->wallSignal));
+						else
+							drivePid(culPid(50, sensor->wallSignal));
 						delay10ms(1);
-					}
-				break;
-				case SEARCH_WALL:
-					if(sensor->wallSignal>0){
-						//driveDirect(0xFF90, 0x0070);
-						//delay10ms(50);
-						driveDirect(0x0000, 0x0000);
-						delay10ms(50);
-						resetIntegral();
-						robotState = RUNNING;
-					}
-					else{
-						driveDirect(0x0070, 0x0070);
-						delay10ms(5);
-						driveDirect(0x0070, 0xFF90);
-						delay10ms(5);
 					}
 				break;
 				case SEARCH_HOME:
@@ -210,8 +196,6 @@ int main (void) {
 							robotState = GO_HOME;
 						}
 					}
-				break;
-				case CHARGING:
 				break;
 				default:
 				break;
