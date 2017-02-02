@@ -37,12 +37,14 @@ int main (void) {
 
 	byteTx(CmdFull);
 	flushRx();
-
+	
+	LEDBothOff;
+	
 	while(1){
-		// ?Z???T?????X?V
+		// センサ情報更新
 		updateAllSensors(sensor);
 
-		// ?v???C?{?^????????
+		// プレイボタンが押された場合、壁沿い走行を開始
 		if(isPressed(PLAY_BUTTON, sensor)==1
 			&& !sensor->chargingSourcesAvailable){
 			robotState =
@@ -51,7 +53,7 @@ int main (void) {
 				WAIT;
 		}
 
-		// ?A?h?o???X?{?^????????
+		// アドバンスボタンが押された場合、ホーム探索を開始
 		if(isPressed(ADVANCE_BUTTON, sensor)==1
 			&& !sensor->chargingSourcesAvailable){
 			robotState =
@@ -60,12 +62,12 @@ int main (void) {
 				WAIT;
 		}
 
-		// ???W???[???{?^????????
+		// モジュールボタンが押された場合、"Hello, Create!!"を送信する
 		if(isPressed(MODULE_BUTTON, sensor)==1){
 			sendString("Hello, Create!!\r\\n");
 		}
 
-
+		// ロボットが地面に置かれている間、下記の処理を行う
 		if(sensor->cliffLeft==0
 			&& sensor->cliffFrontLeft==0
 			&& sensor->cliffFrontRight==0
@@ -87,6 +89,8 @@ int main (void) {
 						robotState = GO_HOME;
 					}
 					if(sensor->bumpAndWheelDrops==1){
+						LED1On;
+						LED2Off;
 						driveDirect(0xFF00, 0xFF00);
 						delay10ms(10);
 						driveDirect(0x0000, 0x0000);
@@ -98,6 +102,8 @@ int main (void) {
 						resetIntegral();
 					}
 					else if(sensor->bumpAndWheelDrops==2){
+						LED1Off;
+						LED2On;
 						driveDirect(0xFF00, 0xFF00);
 						delay10ms(10);
 						driveDirect(0x0000, 0x0000);
@@ -109,6 +115,7 @@ int main (void) {
 						resetIntegral();
 					}
 					else if(sensor->bumpAndWheelDrops==3){
+						LEDBothOn;
 						driveDirect(0xFF00, 0xFF00);
 						delay10ms(10);
 						driveDirect(0x0000, 0x0000);
@@ -120,10 +127,11 @@ int main (void) {
 						resetIntegral();
 					}
 					else{
-						if(sensor->wallSignal>50)
-							drivePid(culPid(150, sensor->wallSignal));
+						LEDBothOff;
+						if(sensor->wallSignal>TARGET_LOW)
+							drivePid(culPid(TARGET_HIGH, sensor->wallSignal));
 						else
-							drivePid(culPid(50, sensor->wallSignal));
+							drivePid(culPid(TARGET_LOW, sensor->wallSignal));
 						delay10ms(1);
 					}
 				break;
@@ -190,6 +198,8 @@ int main (void) {
 						}
 						else{
 							driveDirect(0xFF00, 0xFF00);
+							byteTx(CmdPlay);
+							byteTx(DEBUG_SONG);
 							delay10ms(50);
 							robotState = GO_HOME;
 						}
