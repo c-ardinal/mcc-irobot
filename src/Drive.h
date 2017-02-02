@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------ *
- * @file	: Communicate.c
- * @brief	: 通信関連の処理を行う
+ * @file	: Drive.h
+ * @brief	: Drive.c用のヘッダファイル
  * ------------------------------------------------------ *
  */
 #ifndef _DRIVE_H_
@@ -13,11 +13,6 @@
  * @brief	: インクルードファイル
  * ------------------------------------------------------ *
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <avr/interrupt.h>
-#include <avr/io.h>
-#include <util/delay.h>
 #include "oi.h"
 #include "Constant.h"
 #include "Sensor.h"

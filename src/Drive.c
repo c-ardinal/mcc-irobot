@@ -7,7 +7,7 @@
 #include "Drive.h"
 
 
-
+// 積分値保存用
 static int integral = 0;
 
 
