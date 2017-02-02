@@ -12,14 +12,13 @@
  * @brief	: グローバル変数
  * ------------------------------------------------------ *
  */
-int integral=0;
 robotState_t robotState = WAIT;
 
 
 /*
  * ------------------------------------------------------ *
  * @function: メイン関数
- * @param		: void
+ * @param	: void
  * @return	: void
  * ------------------------------------------------------ *
  */
@@ -41,10 +40,10 @@ int main (void) {
 	flushRx();
 
 	while(1){
-		// �Z���T�����X�V
+		// ?Z???T?????X?V
 		updateAllSensors(sensor);
 
-		// �v���C�{�^��������
+		// ?v???C?{?^????????
 		if(isPressed(PLAY_BUTTON, sensor)==1
 			&& !sensor->chargingSourcesAvailable){
 			robotState =
@@ -53,7 +52,7 @@ int main (void) {
 				WAIT;
 		}
 
-		// �A�h�o���X�{�^��������
+		// ?A?h?o???X?{?^????????
 		if(isPressed(ADVANCE_BUTTON, sensor)==1
 			&& !sensor->chargingSourcesAvailable){
 			robotState =
@@ -62,7 +61,7 @@ int main (void) {
 				WAIT;
 		}
 
-		// ���W���[���{�^��������
+		// ???W???[???{?^????????
 		if(isPressed(MODULE_BUTTON, sensor)==1){
 			//sprintf(buff, "%u\r\\n", ((unsigned int)(sensor->wallSignal&0x0f00>>4)*16)+(unsigned int)(sensor->wallSignal&0x00ff));
 			//sprintf(buff, "%u\r\\n", sensor->wallSignal);
@@ -99,7 +98,7 @@ int main (void) {
 						delay10ms(60);
 						driveDirect(0x0000, 0x0000);
 						delay10ms(20);
-						integral = 0;
+						resetIntegral();
 					}
 					else if(sensor->bumpAndWheelDrops==2){
 						driveDirect(0xFF00, 0xFF00);
@@ -110,7 +109,7 @@ int main (void) {
 						delay10ms(60);
 						driveDirect(0x0000, 0x0000);
 						delay10ms(20);
-						integral = 0;
+						resetIntegral();
 					}
 					else if(sensor->bumpAndWheelDrops==3){
 						driveDirect(0xFF00, 0xFF00);
@@ -121,7 +120,7 @@ int main (void) {
 						delay10ms(190);
 						driveDirect(0x0000, 0x0000);
 						delay10ms(20);
-						integral = 0;
+						resetIntegral();
 					}
 					else{
 						drivePid(culPid(120, sensor->wallSignal));
@@ -134,7 +133,7 @@ int main (void) {
 						//delay10ms(50);
 						driveDirect(0x0000, 0x0000);
 						delay10ms(50);
-						integral = 0;
+						resetIntegral();
 						robotState = RUNNING;
 					}
 					else{
@@ -229,7 +228,7 @@ int main (void) {
 /*
  * ------------------------------------------------------ *
  * @function: ロボットを初期化する
- * @param		: void
+ * @param	: void
  * @return	: void
  * ------------------------------------------------------ *
  */
@@ -253,7 +252,7 @@ void initRobot(void){
 /*
  * ------------------------------------------------------ *
  * @function: ロボットの電源を投入する
- * @param		: void
+ * @param	: void
  * @return	: void
  * ------------------------------------------------------ *
  */
@@ -275,7 +274,7 @@ void powerOnRobot(void)
 /*
  * ------------------------------------------------------ *
  * @function: 10msのウェイトを行う
- * @param		: 待機時間
+ * @param	: 待機時間
  * @return	: void
  * ------------------------------------------------------ *
  */
@@ -288,7 +287,7 @@ void delay10ms(unsigned int delay_10ms){
 /*
  * ------------------------------------------------------ *
  * @function: サウンドを設定する
- * @param		: void
+ * @param	: void
  * @return	: void
  * ------------------------------------------------------ *
  */
@@ -351,75 +350,4 @@ void defineSongs(void){
 	byteTx(1);
 	byteTx(86);
 	byteTx(16);
-}
-
-
-/*
- * ------------------------------------------------------ *
- * @function: 曲率を用いた走行を行う
- * @param		: 速度、曲率
- * @return	: void
- * ------------------------------------------------------ *
- */
-void driveTurn(int16_t velocity, int16_t radius){
-  byteTx(CmdDrive);
-  byteTx((uint8_t)((velocity >> 8) & 0x00FF));
-  byteTx((uint8_t)(velocity & 0x00FF));
-  byteTx((uint8_t)((radius >> 8) & 0x00FF));
-  byteTx((uint8_t)(radius & 0x00FF));
-}
-
-
-/*
- * ------------------------------------------------------ *
- * @function: 直線走行を行う
- * @param		: 右モータ速さ、左モータ速さ
- * @return	: void
- * ------------------------------------------------------ *
- */
-void driveDirect(int16_t rightVelocity, int16_t leftVelocity){
-  byteTx(CmdDriveWheels);
-  byteTx((uint8_t)((rightVelocity >> 8) & 0x00FF));
-  byteTx((uint8_t)(rightVelocity & 0x00FF));
-  byteTx((uint8_t)((leftVelocity >> 8) & 0x00FF));
-  byteTx((uint8_t)(leftVelocity & 0x00FF));
-}
-
-
-/*
- * ------------------------------------------------------ *
- * @function: PID制御量を算出する
- * @param		: 目標値、現在地
- * @return	: 制御量
- * ------------------------------------------------------ *
- */
-uint16_t culPid(uint8_t target, uint8_t now){
-	static int pastDiff = 0;
-	int result = 0, nowDiff = 0;
-
-	pastDiff = nowDiff;
-	nowDiff = ((int)target-(int)now);
-	integral += (nowDiff+pastDiff)/2*TIME;
-
-	int tp = KP*nowDiff;
-	int ti = KI*integral;
-	int td = KD*(nowDiff-pastDiff)/TIME;
-
-	result = tp+ti+td;
-	return result;
-}
-
-
-/*
- * ------------------------------------------------------ *
- * @function: PID制御量を用いた走行を行う
- * @param		: PID制御量
- * @return	: void
- * ------------------------------------------------------ *
- */
-void drivePid(int pid){
-	uint16_t rightPower=0, leftPower=0;
-	rightPower = 0x00F0-(pid/2);
-	leftPower  = 0x00F0+pid;
-	driveDirect(rightPower, leftPower);
 }
