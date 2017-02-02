@@ -88,7 +88,7 @@ typedef enum{
  * ------------------------------------------------------ *
  */
 uint8_t getSensor(uint8_t);
-void updateAllSensors(snsor_t);
+void updateAllSensors(sensor_t);
 int isPressed(buttonId_t, sensor_t);
 
 

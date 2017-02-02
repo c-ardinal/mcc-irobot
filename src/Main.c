@@ -24,10 +24,8 @@ robotState_t robotState = WAIT;
  */
 int main (void) {
 	sensor_t sensor;
+	sensor = (sensor_t)malloc(sizeof(sensor_t));
 	int count=0;
-	uint16_t pastWallSignal = 0;
-	char buff[64]; 
-	
 	
 	initRobot();
 
