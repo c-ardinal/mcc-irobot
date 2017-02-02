@@ -1,59 +1,75 @@
+/*
+ * ------------------------------------------------------ *
+ * @file	: Main.c
+ * @brief	: ãƒ­ãƒœãƒƒãƒˆã®å…¨ä½“çš„ãªåˆ¶å¾¡ã‚’è¡Œã†
+ * ------------------------------------------------------ *
+ */
 #include "Main.h"
 
 
-/* ƒOƒ[ƒoƒ‹•Ï”‚ÌéŒ¾ */
+/*
+ * ------------------------------------------------------ *
+ * @brief	: ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
+ * ------------------------------------------------------ *
+ */
 int integral=0;
 robotState_t robotState = WAIT;
 
 
-/* mainŠÖ” */
+/*
+ * ------------------------------------------------------ *
+ * @function: ãƒ¡ã‚¤ãƒ³é–¢æ•°
+ * @param		: void
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 int main (void) {
 	sensor_t sensor;
 	int count=0;
-	//char buff[64]; 
-	
-	
+	//char buff[64];
+
+
 	initRobot();
-	 
+
 	byteTx(CmdStart);
-	  
+
 	setBaud(Baud28800, Ubrr28800);
-	  
+
 	defineSongs();
-	
+
 	byteTx(CmdFull);
 	flushRx();
 
 	while(1){
-		// ƒZƒ“ƒTî•ñXV
+		// ï¿½Zï¿½ï¿½ï¿½Tï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½V
 		updateAllSensors(sensor);
-		
-		// ƒvƒŒƒCƒ{ƒ^ƒ“‰Ÿ‰º
+
+		// ï¿½vï¿½ï¿½ï¿½Cï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		if(isPressed(PLAY_BUTTON, sensor)==1
 			&& !sensor->chargingSourcesAvailable){
-			robotState = 
-				(robotState == WAIT)? 
-				RUNNING: 
+			robotState =
+				(robotState == WAIT)?
+				RUNNING:
 				WAIT;
 		}
-		
-		// ƒAƒhƒoƒ“ƒXƒ{ƒ^ƒ“‰Ÿ‰º
+
+		// ï¿½Aï¿½hï¿½oï¿½ï¿½ï¿½Xï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		if(isPressed(ADVANCE_BUTTON, sensor)==1
 			&& !sensor->chargingSourcesAvailable){
-			robotState = 
-				(robotState == WAIT)? 
-				SEARCH_HOME: 
+			robotState =
+				(robotState == WAIT)?
+				SEARCH_HOME:
 				WAIT;
 		}
-		
-		// ƒ‚ƒWƒ…[ƒ‹ƒ{ƒ^ƒ“‰Ÿ‰º
+
+		// ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		if(isPressed(MODULE_BUTTON, sensor)==1){
 			//sprintf(buff, "%u\r\\n", ((unsigned int)(sensor->wallSignal&0x0f00>>4)*16)+(unsigned int)(sensor->wallSignal&0x00ff));
 			//sprintf(buff, "%u\r\\n", sensor->wallSignal);
 			sendString("Hello, Create!!\r\\n");
 		}
-		
-		
+
+
 		if(sensor->cliffLeft==0
 			&& sensor->cliffFrontLeft==0
 			&& sensor->cliffFrontRight==0
@@ -206,44 +222,41 @@ int main (void) {
 			robotState = WAIT;
 			driveDirect(0x0000, 0x0000);
 		}
-		
-		/*
-		if(sensor->batteryCharge<=300){
-			byteTx(CmdPlay);
-			byteTx(DEBUG_SONG);
-			delay10ms(32);
-		}*/
-		
 	}//while::end
 }//main::end
 
 
-
-
+/*
+ * ------------------------------------------------------ *
+ * @function: ãƒ­ãƒœãƒƒãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹
+ * @param		: void
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 void initRobot(void){
-	// Turn off interrupts
 	cli();
-
-	// Configure the I/O pins
 	DDRB = 0x10;
 	PORTB = 0xCF;
 	DDRC = 0x02;
 	PORTC = 0xFF;
 	DDRD = 0xE6;
 	PORTD = 0x7D;
-
-	// Set up the serial port for 57600 baud
 	UBRR0 = Ubrr57600;
 	UCSR0B = (_BV(TXEN0) | _BV(RXEN0));
 	UCSR0C = (_BV(UCSZ00) | _BV(UCSZ01));
-	  
 	setSerial(getSerialDestination());
 	powerOnRobot();
 }
 
 
 
-/* ƒƒ{ƒbƒg‚Ì“dŒ¹“Š“üŠÖ” */
+/*
+ * ------------------------------------------------------ *
+ * @function: ãƒ­ãƒœãƒƒãƒˆã®é›»æºã‚’æŠ•å…¥ã™ã‚‹
+ * @param		: void
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 void powerOnRobot(void)
 {
 	if(!RobotIsOn){
@@ -259,13 +272,26 @@ void powerOnRobot(void)
 }
 
 
-/* 10ms‚Ì‘Ò‚¿ŠÖ” */
+/*
+ * ------------------------------------------------------ *
+ * @function: 10msã®ã‚¦ã‚§ã‚¤ãƒˆã‚’è¡Œã†
+ * @param		: å¾…æ©Ÿæ™‚é–“
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 void delay10ms(unsigned int delay_10ms){
 	while(delay_10ms-- > 0)
 		_delay_loop_2(46080);
 }
 
 
+/*
+ * ------------------------------------------------------ *
+ * @function: ã‚µã‚¦ãƒ³ãƒ‰ã‚’è¨­å®šã™ã‚‹
+ * @param		: void
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 void defineSongs(void){
 	// Create song
 	byteTx(CmdSong);
@@ -313,13 +339,13 @@ void defineSongs(void){
 	byteTx(24);
 	byteTx(69);
 	byteTx(48);
-	
+
 	byteTx(CmdSong);
 	byteTx(DEBUG_SONG);
 	byteTx(1);
 	byteTx(62);
 	byteTx(16);
-	
+
 	byteTx(CmdSong);
 	byteTx(CHARGE_START_SONG);
 	byteTx(1);
@@ -328,7 +354,13 @@ void defineSongs(void){
 }
 
 
-/* Ös‘–sŠÖ” */
+/*
+ * ------------------------------------------------------ *
+ * @function: æ›²ç‡ã‚’ç”¨ã„ãŸèµ°è¡Œã‚’è¡Œã†
+ * @param		: é€Ÿåº¦ã€æ›²ç‡
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 void driveTurn(int16_t velocity, int16_t radius){
   byteTx(CmdDrive);
   byteTx((uint8_t)((velocity >> 8) & 0x00FF));
@@ -338,7 +370,13 @@ void driveTurn(int16_t velocity, int16_t radius){
 }
 
 
-/* ’¼i‘–sŠÖ” */
+/*
+ * ------------------------------------------------------ *
+ * @function: ç›´ç·šèµ°è¡Œã‚’è¡Œã†
+ * @param		: å³ãƒ¢ãƒ¼ã‚¿é€Ÿã•ã€å·¦ãƒ¢ãƒ¼ã‚¿é€Ÿã•
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 void driveDirect(int16_t rightVelocity, int16_t leftVelocity){
   byteTx(CmdDriveWheels);
   byteTx((uint8_t)((rightVelocity >> 8) & 0x00FF));
@@ -348,23 +386,37 @@ void driveDirect(int16_t rightVelocity, int16_t leftVelocity){
 }
 
 
+/*
+ * ------------------------------------------------------ *
+ * @function: PIDåˆ¶å¾¡é‡ã‚’ç®—å‡ºã™ã‚‹
+ * @param		: ç›®æ¨™å€¤ã€ç¾åœ¨åœ°
+ * @return	: åˆ¶å¾¡é‡
+ * ------------------------------------------------------ *
+ */
 uint16_t culPid(uint8_t target, uint8_t now){
 	static int pastDiff = 0;
 	int result = 0, nowDiff = 0;
-	
+
 	pastDiff = nowDiff;
 	nowDiff = ((int)target-(int)now);
 	integral += (nowDiff+pastDiff)/2*TIME;
-	
+
 	int tp = KP*nowDiff;
 	int ti = KI*integral;
 	int td = KD*(nowDiff-pastDiff)/TIME;
-	
+
 	result = tp+ti+td;
 	return result;
 }
 
 
+/*
+ * ------------------------------------------------------ *
+ * @function: PIDåˆ¶å¾¡é‡ã‚’ç”¨ã„ãŸèµ°è¡Œã‚’è¡Œã†
+ * @param		: PIDåˆ¶å¾¡é‡
+ * @return	: void
+ * ------------------------------------------------------ *
+ */
 void drivePid(int pid){
 	uint16_t rightPower=0, leftPower=0;
 	rightPower = 0x00F0-(pid/2);

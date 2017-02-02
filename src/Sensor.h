@@ -1,7 +1,18 @@
+/*
+ * ------------------------------------------------------ *
+ * @file	: Sensor.h
+ * @brief	: Sensor.cç”¨ã®ãƒ˜ãƒƒãƒ€ãƒ•ã‚¡ã‚¤ãƒ«
+ * ------------------------------------------------------ *
+ */
 #ifndef _SENSOR_H_
 #define _SENSOR_H_
 
 
+/*
+ * ------------------------------------------------------ *
+ * @brief	: ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«
+ * ------------------------------------------------------ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
@@ -11,7 +22,11 @@
 #include "Communicate.h"
 
 
-/* ƒ{ƒ^ƒ“”Ô†‚Ì’è‹` */
+/*
+ * ------------------------------------------------------ *
+ * @brief	: ãƒœã‚¿ãƒ³ç•ªå·
+ * ------------------------------------------------------ *
+ */
 typedef enum{
 	PLAY_BUTTON,
 	ADVANCE_BUTTON,
@@ -20,8 +35,11 @@ typedef enum{
 } buttonId_t;
 
 
-/* ƒZƒ“ƒTî•ñŠÇ——p\‘¢‘Ì(nByte, ValueRenge) */
-typedef struct{
+/*
+ * ------------------------------------------------------ *
+ * @brief	: ã‚»ãƒ³ã‚µå€¤ç®¡ç†æ›œæ§‹é€ ä½“
+ * ------------------------------------------------------ *
+ */typedef struct{
 	//Packet:0, 1, 6
 	uint8_t bumpAndWheelDrops;			//1, 0~31
 	uint8_t wall;						//1, 0~1
@@ -52,7 +70,7 @@ typedef struct{
 	uint8_t userDigitalInputs;			//1, 0~31
 	unsigned int userAnalogInput;		//2, 0~1023
 	uint8_t chargingSourcesAvailable;	//1, 0~3
-	//Packet:5, 6	
+	//Packet:5, 6
 	uint8_t oiMode;						//1, 0~3
 	uint8_t songNumber;					//1, 0~15
 	uint8_t songPlaying;				//1, 0~1
@@ -64,7 +82,11 @@ typedef struct{
 } *sensor_t;
 
 
-/* ŠÖ”ƒvƒƒgƒ^ƒCƒvéŒ¾ */
+/*
+ * ------------------------------------------------------ *
+ * @brief	: ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
+ * ------------------------------------------------------ *
+ */
 uint8_t getSensor(uint8_t);
 void updateAllSensors(snsor_t);
 int isPressed(buttonId_t, sensor_t);
