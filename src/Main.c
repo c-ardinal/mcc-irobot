@@ -73,68 +73,79 @@ int main (void) {
 			&& sensor->cliffFrontRight==0
 			&& sensor->cliffRight==0){
 			switch(robotState){
+				//待機時処理
 				case WAIT:
 					driveDirect(0x0000, 0x0000);
 				break;
+				//壁沿い走行
 				case RUNNING:
-					if(sensor->irByte==252)
-						robotState = SEARCH_HOME;
-					else if(sensor->irByte==242){
-						driveDirect(0x0070, 0xFF90);
-						delay10ms(130);
+					if(getIntegral()>=300){
 						driveDirect(0x00A0, 0x00A0);
-						delay10ms(600);
-						driveDirect(0xFF90, 0x0070);
-						delay10ms(240);
-						robotState = GO_HOME;
-					}
-					if(sensor->bumpAndWheelDrops==1){
-						LED1On;
-						LED2Off;
-						driveDirect(0xFF00, 0xFF00);
-						delay10ms(10);
-						driveDirect(0x0000, 0x0000);
-						delay10ms(50);
-						driveDirect(0x0070, 0xFF90);
-						delay10ms(60);
-						driveDirect(0x0000, 0x0000);
-						delay10ms(20);
-						resetIntegral();
-					}
-					else if(sensor->bumpAndWheelDrops==2){
-						LED1Off;
-						LED2On;
-						driveDirect(0xFF00, 0xFF00);
-						delay10ms(10);
-						driveDirect(0x0000, 0x0000);
-						delay10ms(50);
-						driveDirect(0xFF90, 0x0070);
-						delay10ms(60);
-						driveDirect(0x0000, 0x0000);
-						delay10ms(20);
-						resetIntegral();
-					}
-					else if(sensor->bumpAndWheelDrops==3){
-						LEDBothOn;
-						driveDirect(0xFF00, 0xFF00);
-						delay10ms(10);
-						driveDirect(0x0000, 0x0000);
-						delay10ms(50);
-						driveDirect(0x0070, 0xFF90);
-						delay10ms(190);
-						driveDirect(0x0000, 0x0000);
-						delay10ms(20);
-						resetIntegral();
+						if(sensor->bumpAndWheelDrops!=0){
+							resetIntegral();
+						}
 					}
 					else{
-						LEDBothOff;
-						if(sensor->wallSignal>TARGET_LOW)
-							drivePid(culPid(TARGET_HIGH, sensor->wallSignal));
-						else
-							drivePid(culPid(TARGET_LOW, sensor->wallSignal));
-						delay10ms(1);
+						if(sensor->irByte==252)
+							robotState = SEARCH_HOME;
+						else if(sensor->irByte==242){
+							driveDirect(0x0070, 0xFF90);
+							delay10ms(130);
+							driveDirect(0x00A0, 0x00A0);
+							delay10ms(600);
+							driveDirect(0xFF90, 0x0070);
+							delay10ms(240);
+							robotState = GO_HOME;
+						}
+						if(sensor->bumpAndWheelDrops==1){
+							LED1On;
+							LED2Off;
+							driveDirect(0xFF00, 0xFF00);
+							delay10ms(10);
+							driveDirect(0x0000, 0x0000);
+							delay10ms(20);
+							driveDirect(0x0070, 0xFF90);
+							delay10ms(60);
+							driveDirect(0x0000, 0x0000);
+							delay10ms(20);
+							resetIntegral();
+						}
+						else if(sensor->bumpAndWheelDrops==2){
+							LED1Off;
+							LED2On;
+							driveDirect(0xFF00, 0xFF00);
+							delay10ms(10);
+							driveDirect(0x0000, 0x0000);
+							delay10ms(20);
+							driveDirect(0xFF90, 0x0070);
+							delay10ms(60);
+							driveDirect(0x0000, 0x0000);
+							delay10ms(20);
+							resetIntegral();
+						}
+						else if(sensor->bumpAndWheelDrops==3){
+							LEDBothOn;
+							driveDirect(0xFF00, 0xFF00);
+							delay10ms(10);
+							driveDirect(0x0000, 0x0000);
+							delay10ms(20);
+							driveDirect(0x0070, 0xFF90);
+							delay10ms(190);
+							driveDirect(0x0000, 0x0000);
+							delay10ms(20);
+							resetIntegral();
+						}
+						else{
+							LEDBothOff;
+							if(sensor->wallSignal>TARGET_LOW)
+								drivePid(culPid(TARGET_HIGH, sensor->wallSignal));
+							else
+								drivePid(culPid(TARGET_LOW, sensor->wallSignal));
+							delay10ms(1);
+						}
 					}
 				break;
+				//ホームベース探索
 				case SEARCH_HOME:
 					driveDirect(0x0070, 0x0070);
 					if(sensor->irByte==252){
@@ -143,6 +154,7 @@ int main (void) {
 						robotState = GO_HOME;
 					}
 				break;
+				//ホームベースへ向かう
 				case GO_HOME:
 					updateAllSensors(sensor);
 					switch(sensor->irByte){
@@ -186,6 +198,7 @@ int main (void) {
 						robotState = CHECK_HOME;
 					}
 				break;
+				//ホームにドッキングしたか確認する
 				case CHECK_HOME:
 					delay10ms(1);
 					if(count++>20){
@@ -212,6 +225,7 @@ int main (void) {
 		else{
 			robotState = WAIT;
 			driveDirect(0x0000, 0x0000);
+			resetIntegral();
 		}
 	}//while::end
 }//main::end

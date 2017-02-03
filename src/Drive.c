@@ -92,3 +92,15 @@ void drivePid(int pid){
 void resetIntegral(void){
 	integral = 0;
 }
+
+
+/*
+ * ------------------------------------------------------ *
+ * @function: PID制御による積分値を渡す
+ * @param	: void
+ * @return	: 積分値
+ * ------------------------------------------------------ *
+ */
+int getIntegral(void){
+	return integral;
+}
